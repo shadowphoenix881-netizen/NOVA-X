@@ -1,0 +1,39 @@
+
+name: Build NOVA X APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            git zip unzip openjdk-17-jdk \
+            python3-pip build-essential \
+            autoconf libtool pkg-config \
+            zlib1g-dev libffi-dev libssl-dev
+
+      - name: Install Buildozer
+        run: |
+          pip3 install --user --break-system-packages \
+            buildozer cython==0.29.36
+
+      - name: Build APK
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          buildozer android debug
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NOVA-X-APK
+          path: bin/*.apk
+          
